@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Telegram Chat</title>
+  <style>
+    body { font-family: Arial; background: #f4f4f4; }
+    #chat { height: 400px; overflow-y: auto; background: #fff; padding: 10px; border-radius: 8px; margin-bottom: 10px; }
+    input { width: 75%; padding: 8px; }
+    button { width: 20%; padding: 8px; }
+  </style>
+</head>
+<body>
+  <h2>💬 Чат пользователей Telegram</h2>
+  <div id="chat"></div>
+  <input id="msg" placeholder="Введите сообщение..." />
+  <button onclick="send()">Отправить</button>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    const ws = new WebSocket("ws://" + window.location.host);
+    const chat = document.getElementById("chat");
+    const msgInput = document.getElementById("msg");
+
+    ws.onmessage = (event) => {
+      const p = document.createElement("p");
+      p.textContent = event.data;
+      chat.appendChild(p);
+      chat.scrollTop = chat.scrollHeight;
+    };
+
+    function send() {
+      if (!msgInput.value) return;
+      const name = tg.initDataUnsafe?.user?.first_name || "Гость";
+      const text = name + ": " + msgInput.value;
+      ws.send(text);
+      msgInput.value = "";
+    }
+  </script>
+</body>
+</html>
